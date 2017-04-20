@@ -31,7 +31,7 @@ class DetailController extends GeneralController
 
             return $this->render('index', compact('detail'));
         });
-        
+
 
     }
 
@@ -44,8 +44,43 @@ class DetailController extends GeneralController
         $this->sourceJs = null;
 
         $package = $this->listProductPackage(Yii::$app->request->get('id'));
+        $this->dump($package);
 
         return $this->render('conbo', compact('package'));
 
+    }
+
+    /**
+     * 用户支付
+     */
+    public function actionAjaxUserPay()
+    {
+        // TODO 验证参数并组织以下数据数组
+        // 单个套餐数量不超过 10
+        // 验证验证码的有效性
+        $params=Yii::$app->request->post();
+        $productId = Yii::$app->request->get('id');
+        $package = [
+            1 => 2,
+            2 => 3
+        ];
+        $userInfo = [
+            'name' => $params['name'],
+            'phone' => $params['phone'],
+            'captcha' => $params['captcha']
+        ];
+        $paymentMethod = 'wx';
+
+        // TODO 修改用户表对应数据
+
+        // TODO 生成下单链接
+        if (!in_array($paymentMethod, ['wx', 'ali'])) {
+            $this->error(Yii::t('common', 'payment link illegal'));
+        }
+
+        return $this->createSafeLink([
+            'product_id' => $productId,
+            'package' => $package
+        ], 'order/' . $paymentMethod . '/');
     }
 }
